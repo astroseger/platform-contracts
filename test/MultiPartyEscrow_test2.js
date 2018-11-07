@@ -61,14 +61,27 @@ contract('MultiPartyEscrow', function(accounts) {
 
         it ("Try to open 100000 channels", async function()
         {
+            var rez;
+            for (var a = 0; a < 10; a++)
+            {
             let expiration   = web3.eth.getBlock(web3.eth.blockNumber).timestamp + 10000000
             let value        = 1000
             let replicaId    = 44
-            for (var i = 0; i < 1000; i++) 
+
+            await token.transfer(accounts[a],  10000000, {from:accounts[0]});
+            await token.approve(escrow.address,10000000, {from:accounts[a]});
+            await escrow.deposit(1000000, {from:accounts[a]});
+
+
+            for (var i = 0; i < 100; i++) 
             {
-               await escrow.openChannel(accounts[5], value, expiration, replicaId, {from:accounts[0]})
+
+               await escrow.openChannel(accounts[5], value, expiration, replicaId, {from:accounts[a]})
+                //rez = await escrow.getSenderChannelsArray({from:accounts[a]})
+                //console.log(rez)
+                //console.log(" ")
             }
-            
+            }
         });
 
 });
