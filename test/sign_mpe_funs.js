@@ -14,18 +14,18 @@ function signMessage(fromAccount, message, callback)
 }
 
 
-function composeClaimMessage(contractAddress, channelId, nonce, amount)
+function composeClaimMessage(contractAddress, channelId, amount)
 {
     var sigPrefix = "__MPE_claim_message";
     return ethereumjsabi.soliditySHA3(
-        ["string", "address",        "uint256",  "uint256", "uint256"],
-        [sigPrefix, contractAddress, channelId, nonce,      amount]);
+        ["string", "address",        "uint256",  "uint256"],
+        [sigPrefix, contractAddress, channelId,  amount]);
 }
 
 
-function signClaimMessage(fromAccount, contractAddress, channelId, nonce, amount, callback) 
+function signClaimMessage(fromAccount, contractAddress, channelId, amount, callback) 
 {
-    var message = composeClaimMessage(contractAddress, channelId, nonce, amount);
+    var message = composeClaimMessage(contractAddress, channelId, amount);
     signMessage(fromAccount, message, callback);
 }
 
@@ -55,8 +55,8 @@ function recoverSigner(message, signature) {
     return signer;
 }
 
-function isValidSignatureClaim(contractAddress, channelId, nonce, amount, signature, expectedSigner) {
-    var message = prefixed(composeClaimMessage(contractAddress, channelId, nonce, amount));
+function isValidSignatureClaim(contractAddress, channelId, amount, signature, expectedSigner) {
+    var message = prefixed(composeClaimMessage(contractAddress, channelId, amount));
     var signer  = recoverSigner(message, signature);
     return signer.toLowerCase() ==
         ethereumjsutil.stripHexPrefix(expectedSigner).toLowerCase();
@@ -78,11 +78,11 @@ function getVRSFromSignature(signature) {
 
 }
 
-async function waitSignedClaimMessage(fromAccount, contractAddress, channelId, nonce, amount)
+async function waitSignedClaimMessage(fromAccount, contractAddress, channelId, amount)
 {
     let detWait = true;
     let rezSign;
-    signClaimMessage(fromAccount, contractAddress, channelId, nonce, amount, function(err,sgn)
+    signClaimMessage(fromAccount, contractAddress, channelId, amount, function(err,sgn)
         {   
             detWait = false;
             rezSign = sgn
